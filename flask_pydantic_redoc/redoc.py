@@ -1,4 +1,4 @@
-from flask import jsonify, render_template
+from flask import jsonify, render_template, Blueprint
 from apispec_webframeworks.flask import FlaskPlugin
 from .pydantic_ext import PydanticPlugin
 from apispec import APISpec
@@ -35,15 +35,18 @@ class Redoc:
 
         self.app.before_request(self.docstrings_to_openapi)
 
-        @app.route('/docs/json', methods=['GET'])
+        redoc_bp = Blueprint('redoc', __name__, template_folder='templates')
+
+        self.app.before_request(self.docstrings_to_openapi)
+
+        @redoc_bp.route('/docs/json', methods=['GET'])
         def get_openapi_spec():
             return self.get_spec()
 
-        @app.route("/docs", methods=["GET"])
+        @redoc_bp.route("/docs", methods=["GET"])
         def get_redoc():
             spec_file = self.spec.to_dict()
             return render_template("redoc.html", spec_file=spec_file, use_cdn=True)
-
 
     def docstrings_to_openapi(self):
         if self._is_initialized:
