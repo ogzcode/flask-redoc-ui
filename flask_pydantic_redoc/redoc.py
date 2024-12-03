@@ -3,6 +3,7 @@ from apispec_webframeworks.flask import FlaskPlugin
 from .pydantic_ext import PydanticPlugin
 from apispec import APISpec
 
+
 class Redoc:
     DEFAULT_CONFIG = {
         'title': 'ReDoc',
@@ -36,7 +37,6 @@ class Redoc:
         def get_openapi_spec():
             return self.get_spec()
 
-
         @app.route("/docs", methods=["GET"])
         def get_redoc():
             spec_file = self.spec.to_dict()
@@ -45,7 +45,7 @@ class Redoc:
         self.app.before_request(self.docstrings_to_openapi)
 
     def docstrings_to_openapi(self):
-        
+
         for schema in self.schemas:
             self.add_schema(schema)
 
@@ -57,8 +57,8 @@ class Redoc:
 
     def get_spec(self):
         return jsonify(self.spec_file)
-    
 
     def add_schema(self, model):
-        self.spec.components.schema(
-            model.__name__, component=model.model_json_schema(), )
+        if model.__name__ not in self.spec.components.schemas:
+            self.spec.components.schema(
+                model.__name__, component=model.model_json_schema(), )
