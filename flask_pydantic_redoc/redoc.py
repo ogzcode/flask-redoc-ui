@@ -33,6 +33,8 @@ class Redoc:
         self.app = app
         self.config.update(self.app.config.get('REDOC', {}))
 
+        self.app.before_request(self.docstrings_to_openapi)
+
         @app.route('/docs/json', methods=['GET'])
         def get_openapi_spec():
             return self.get_spec()
@@ -42,8 +44,6 @@ class Redoc:
             spec_file = self.spec.to_dict()
             return render_template("redoc.html", spec_file=spec_file, use_cdn=True)
 
-        self.app.before_request(self.docstrings_to_openapi)
-        self._is_initialized = True
 
     def docstrings_to_openapi(self):
         if self._is_initialized:
@@ -57,6 +57,7 @@ class Redoc:
                 self.spec.path(view=view_func)
 
         self.spec_file = self.spec.to_dict()
+        self._is_initialized = True
 
     def get_spec(self):
         return jsonify(self.spec_file)
