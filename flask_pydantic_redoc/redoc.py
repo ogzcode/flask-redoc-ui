@@ -12,10 +12,11 @@ class Redoc:
         'plugins': [FlaskPlugin(), PydanticPlugin()]
     }
 
-    def __init__(self, app=None, spec_file=None, config=None):
+    def __init__(self, app=None, spec_file=None, config=None, schemas=[]):
         self.app = app
         self.spec_file = spec_file
         self.config = config or self.DEFAULT_CONFIG.copy()
+        self.schemas = schemas
         self.spec = APISpec(
             title=self.config['title'],
             version=self.config['version'],
@@ -44,6 +45,10 @@ class Redoc:
         self.app.before_request(self.docstrings_to_openapi)
 
     def docstrings_to_openapi(self):
+        
+        for schema in self.schemas:
+            self.add_schema(schema)
+
         for view_name, view_func in self.app.view_functions.items():
             if view_func.__doc__ is not None:
                 self.spec.path(view=view_func)
