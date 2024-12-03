@@ -14,6 +14,7 @@ setup(
     description="Flask extension for generating OpenAPI documentation with Pydantic models and ReDoc UI",
     long_description=long_description,
     long_description_content_type="text/markdown", 
+    include_package_data=True,
     install_requires=[
         'flask',
         'apispec',
