@@ -25,11 +25,16 @@ class Redoc:
             info=self.config['info'],
             plugins=self.config['plugins']
         )
-
+        self._is_initialized = False
         if app is not None:
             self.init_app(app)
 
     def init_app(self, app):
+
+        if self._is_initialized:
+            return
+
+
         self.app = app
         self.config.update(self.app.config.get('REDOC', {}))
 
@@ -43,6 +48,7 @@ class Redoc:
             return render_template("redoc.html", spec_file=spec_file, use_cdn=True)
 
         self.app.before_request(self.docstrings_to_openapi)
+        self._is_initialized = True
 
     def docstrings_to_openapi(self):
 
