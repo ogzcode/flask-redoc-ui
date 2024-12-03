@@ -30,11 +30,6 @@ class Redoc:
             self.init_app(app)
 
     def init_app(self, app):
-
-        if self._is_initialized:
-            return
-
-
         self.app = app
         self.config.update(self.app.config.get('REDOC', {}))
 
@@ -51,6 +46,8 @@ class Redoc:
         self._is_initialized = True
 
     def docstrings_to_openapi(self):
+        if self._is_initialized:
+            return
 
         for schema in self.schemas:
             self.add_schema(schema)
