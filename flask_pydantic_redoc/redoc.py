@@ -9,8 +9,7 @@ class Redoc:
         'title': 'ReDoc',
         'version': '1.0.0',
         'openapi_version': '3.0.2',
-        'info': {'title': 'ReDoc', 'version': '1.0.0'},
-        'plugins': [FlaskPlugin(), PydanticPlugin()]
+        'info': {'title': 'ReDoc', 'version': '1.0.0'}
     }
 
     def __init__(self, app=None, spec_file=None, config=None, schemas=[]):
@@ -23,7 +22,7 @@ class Redoc:
             version=self.config['version'],
             openapi_version=self.config['openapi_version'],
             info=self.config['info'],
-            plugins=self.config['plugins']
+            plugins=[FlaskPlugin(), PydanticPlugin()]
         )
         self._is_initialized = False
         if app is not None:
@@ -47,6 +46,8 @@ class Redoc:
         def get_redoc():
             spec_file = self.spec.to_dict()
             return render_template("redoc.html", spec_file=spec_file, use_cdn=True)
+
+        self.app.register_blueprint(redoc_bp)
 
     def docstrings_to_openapi(self):
         if self._is_initialized:
