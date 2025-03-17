@@ -7,7 +7,7 @@ Flask extension for generating OpenAPI documentation using Pydantic models and R
 ### Installation
 
 ```
-pip install git+https://github.com/ogzcode/flask-pydantic-redoc
+pip install git+https://github.com/ogzcode/flask-redoc-ui
 ```
 
 ### Configuration
