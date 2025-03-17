@@ -5,9 +5,9 @@ with open('README.md', 'r', encoding="utf-8") as file:
     long_description = file.read()  
 
 setup(
-    name='flask_pydantic_redoc',
+    name='flask_redoc_ui',
     version='0.1.0',
-    url='https://github.com/ogzcode/flask-pydantic-redoc',
+    url='https://github.com/ogzcode/flask-redoc_ui',
     author='Oğuzhan Güç(ogzCode)',
     author_email='oguzguc44@gmail.com',
     packages=find_packages(),
