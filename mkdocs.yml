@@ -1,5 +1,8 @@
 site_name: Flask ReDoc Documentation
 site_description: Flask extension for generating OpenAPI documentation using ReDoc UI
+theme:
+  name: material
+
 nav:
   - Home: index.md
   - Installation: installation.md
