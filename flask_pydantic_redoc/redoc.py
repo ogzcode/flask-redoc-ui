@@ -46,7 +46,7 @@ class Redoc:
         def get_redoc():
             spec_file = self.spec.to_dict()
             print(spec_file)
-            return render_template("redoc/index.html", spec_file=spec_file, use_cdn=True)
+            return render_template("redoc.html", spec_file=spec_file, use_cdn=True)
         self.app.register_blueprint(redoc_bp)
 
     def docstrings_to_openapi(self):
