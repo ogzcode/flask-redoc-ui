@@ -45,7 +45,6 @@ class Redoc:
         @redoc_bp.route("/docs", methods=["GET"])
         def get_redoc():
             spec_file = self.spec.to_dict()
-            print(spec_file)
             return render_template("redoc.html", spec_file=spec_file, use_cdn=True)
         self.app.register_blueprint(redoc_bp)
 
@@ -93,9 +92,6 @@ class Redoc:
             self.spec.components.schema(model.__name__, component=schema)
 
     def _add_nested_schemas(self, schema):
-        """
-        İç içe şemaların components/schemas bölümüne eklenmesini sağlar.
-        """
         if 'properties' in schema:
             for field_name, field in schema['properties'].items():
                 if '$ref' in field:
