@@ -18,10 +18,10 @@ class Redoc:
         self.config = config or self.DEFAULT_CONFIG.copy()
         self.schemas = schemas
         self.spec = APISpec(
-            title=self.config['title'],
-            version=self.config['version'],
-            openapi_version=self.config['openapi_version'],
-            info=self.config['info'],
+            title=self.config['title'] or "ReDoc",
+            version=self.config['version'] or "1.0.0",
+            openapi_version=self.config['openapi_version'] or "3.0.2",
+            info=self.config['info'] or "ReDoc",
             plugins=[FlaskPlugin(), PydanticPlugin()]
         )
         self._is_initialized = False
@@ -45,14 +45,13 @@ class Redoc:
         @redoc_bp.route("/docs", methods=["GET"])
         def get_redoc():
             spec_file = self.spec.to_dict()
-            return render_template("redoc.html", spec_file=spec_file, use_cdn=True)
-
+            print(spec_file)
+            return render_template("redoc/index.html", spec_file=spec_file, use_cdn=True)
         self.app.register_blueprint(redoc_bp)
 
     def docstrings_to_openapi(self):
         if self._is_initialized:
             return
-
         for schema in self.schemas:
             self.add_schema(schema)
 
@@ -68,5 +67,45 @@ class Redoc:
 
     def add_schema(self, model):
         if model.__name__ not in self.spec.components.schemas:
-            self.spec.components.schema(
-                model.__name__, component=model.model_json_schema(), )
+            schema = model.model_json_schema()
+
+            # $defs içindeki referansları değiştir
+            if "$defs" in schema:
+                defs = schema.pop("$defs")
+                for key, value in defs.items():
+                    self.spec.components.schema(key, component=value)
+
+                # Tüm referansları düzelt
+                def replace_refs(obj):
+                    if isinstance(obj, dict):
+                        for k, v in obj.items():
+                            if isinstance(v, str) and v.startswith("#/$defs/"):
+                                obj[k] = v.replace(
+                                    "#/$defs/", "#/components/schemas/")
+                            else:
+                                replace_refs(v)
+                    elif isinstance(obj, list):
+                        for item in obj:
+                            replace_refs(item)
+
+                replace_refs(schema)
+            self._add_nested_schemas(schema)
+            self.spec.components.schema(model.__name__, component=schema)
+
+    def _add_nested_schemas(self, schema):
+        """
+        İç içe şemaların components/schemas bölümüne eklenmesini sağlar.
+        """
+        if 'properties' in schema:
+            for field_name, field in schema['properties'].items():
+                if '$ref' in field:
+                    ref = field['$ref']
+                    ref_model_name = ref.split('/')[-1]
+                    if ref_model_name not in self.spec.components.schemas:
+                        nested_schema = self.spec.components.schemas.get(
+                            ref_model_name)
+                        if nested_schema:
+                            self.spec.components.schema(
+                                ref_model_name, component=nested_schema)
+                elif 'properties' in field:
+                    self._add_nested_schemas(field)
