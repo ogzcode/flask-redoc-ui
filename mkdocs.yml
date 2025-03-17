@@ -1,0 +1,10 @@
+site_name: Flask ReDoc Documentation
+site_description: Flask extension for generating OpenAPI documentation using ReDoc UI
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Getting Started: getting-started.md
+  - Pydantic:
+    - Overview: pydantic/index.md
+    - Model Examples: pydantic/models.md
+    - CRUD Operations: pydantic/crud.md
